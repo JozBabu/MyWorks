@@ -1,10 +1,16 @@
 package com.android.myworks.base;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.LayoutRes;
@@ -42,15 +48,26 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
         }
     }
 
+    public BroadcastReceiver broadcastReceiverNetwork = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Boolean status = getConnectivityStatus(context);
+            checkNetwork(status);
+        }
+    };
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setHasOptionsMenu(false);
+
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mViewDataBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false);
+
         return mViewDataBinding.getRoot();
     }
 
@@ -70,6 +87,13 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
     public abstract
     @LayoutRes
     int getLayoutId();
+
+
+    /**
+     * @Check network Status
+     */
+    public abstract
+    void checkNetwork(boolean networkStatus);
 
     public void showProgress() {
         if (mProgressDialog == null) {
@@ -102,4 +126,38 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
     public void showToast(String msg) {
         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
     }
+
+    public boolean getConnectivityStatus(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        return isConnected;
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getContext().unregisterReceiver(broadcastReceiverNetwork);
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerInternetCheckReceiver();
+    }
+
+    private void registerInternetCheckReceiver() {
+        IntentFilter internetFilter = new IntentFilter();
+        internetFilter.addAction("android.net.wifi.STATE_CHANGE");
+        internetFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        getContext().registerReceiver(broadcastReceiverNetwork, internetFilter);
+    }
+
+
 }

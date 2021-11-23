@@ -3,6 +3,7 @@ package com.android.myworks.model;
 import com.google.gson.annotations.SerializedName;
 
 public class LoginResponse {
+
     @SerializedName("Result")
     private String Result;
     @SerializedName("CustomerId")

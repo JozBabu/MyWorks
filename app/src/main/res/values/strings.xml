@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MyWorks</string>
+    <string name="sign_in_account">Sign in to Your Account</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="course_description">Course Description</string>
+    <string name="descr">Student will be provided with a board introduction Student will be provided with a board introductionStudent will be provided with a board introductionStudent will be provided with a board introductionStudent will be provided with a board introductionStudent will be provided with a board introductionStudent will be provided with a board introductionStudent will be provided with a board introductionStudent will be provided with a board introductionStudent</string>
 </resources>

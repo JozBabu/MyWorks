@@ -9,8 +9,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
 
-   private static String BASE_URL = "http://mockup.aabasoft.info/AspireMobileAPI/"; //Staging
-  // private static String BASE_URL ="http://manage.tresreyesgroup.com/";  //Live
+//   private static String BASE_URL = "https://api.postalpincode.in/"; //Staging
+
+    private static String BASE_URL = "http://192.168.234.2:8071/api/"; //LocalHost
+
 
     private static OkHttpClient.Builder httpClient = null;
 

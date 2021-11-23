@@ -1,7 +1,12 @@
 package com.android.myworks.network_check;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +36,7 @@ public class NoInternetDialogFragment extends DialogFragment
         dialog.setArguments(args);
         return dialog;
     }
+
 
     @Override
     public void onAttach(Context context) {
@@ -62,6 +68,17 @@ public class NoInternetDialogFragment extends DialogFragment
         }
     }
 
+    public BroadcastReceiver broadcastReceiverNetwork = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Boolean status = getConnectivityStatus(context);
+
+            checkNetwork(status);
+        }
+    };
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +99,7 @@ public class NoInternetDialogFragment extends DialogFragment
         mBinding.btnRetry.setOnClickListener(this);
     }
 
+
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.btn_retry) {
@@ -89,6 +107,45 @@ public class NoInternetDialogFragment extends DialogFragment
                 mListener.onRetry(null);
                 dismiss();
             }
+        }
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getContext().unregisterReceiver(broadcastReceiverNetwork);
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerInternetCheckReceiver();
+    }
+
+    private void registerInternetCheckReceiver() {
+        IntentFilter internetFilter = new IntentFilter();
+        internetFilter.addAction("android.net.wifi.STATE_CHANGE");
+        internetFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        getContext().registerReceiver(broadcastReceiverNetwork, internetFilter);
+    }
+
+    public boolean getConnectivityStatus(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        return isConnected;
+    }
+
+    private void checkNetwork(boolean networkStatus) {
+        if (networkStatus) {
+            mListener.onRetry(null);
+            dismiss();
         }
     }
 }
