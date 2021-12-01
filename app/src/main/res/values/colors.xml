@@ -10,5 +10,10 @@
     <color name="topColor">#6AF1C6</color>
     <color name="centerColor">#54BDDD</color>
     <color name="bottomColor">#528BFA</color>
+    <color name="buttonDisabled">#CACACC</color>
     <color name="yellow" >#FFEB3B</color>
+    <color name="colorError">#e74c3c</color>
+    <color name="colorLoader">#fff</color>
+    <color name="colorLoaderBackground">#fff</color>
+    <color name="colorTransparent">#05FFFFFF</color>
 </resources>

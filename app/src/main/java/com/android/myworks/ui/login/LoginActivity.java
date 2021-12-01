@@ -1,31 +1,33 @@
 package com.android.myworks.ui.login;
 
 
-
-import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.android.myworks.R;
 import com.android.myworks.base.BaseActivity;
 import com.android.myworks.databinding.ActivityLoginBinding;
 import com.android.myworks.model.LoginResponse;
 import com.android.myworks.ui.bottom_sheet.BottomSheetFragment;
-import com.android.myworks.ui.bottom_tab.RegistrationActivity;
-import com.android.myworks.ui.spinnerwheel.RotateSpinnerActivity;
-import com.android.myworks.ui.toggle.ToggleActivity;
-import com.fedserv.searchablelist.SearchFragment;
+import com.android.myworks.ui.progress_button.TransitionButton;
 
-import java.io.Serializable;
+
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class LoginActivity extends BaseActivity<ActivityLoginBinding> implements ILoginView {
 
     ActivityLoginBinding mBinding;
     private LoginPresenter mPresenter;
     BottomSheetFragment bottomSheetFragment;
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,17 +42,39 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> implements
         mList.add("Test3");
         mList.add("Test4");
         mList.add("Test5");
-
-
+        mBinding.rlLogin.setButtonState(true);
 
         mBinding.rlLogin.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(getApplicationContext(), ToggleActivity.class);
-//                startActivity(intent);
 
 
-                showSpinner();
+                if (mBinding.rlLogin.getButtonState()) {
+
+                    mBinding.rlLogin.startAnimation();
+                    // Do your networking task or background work here.
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            boolean isSuccessful = true;
+
+                            // Choose a stop animation if your call was succesful or not
+                            if (isSuccessful) {
+                                mBinding.rlLogin.stopAnimation(TransitionButton.StopAnimationStyle.EXPAND, new TransitionButton.OnAnimationStopEndListener() {
+                                    @Override
+                                    public void onAnimationStopEnd() {
+                                        Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            } else {
+                                mBinding.rlLogin.stopAnimation(TransitionButton.StopAnimationStyle.SHAKE, null);
+                            }
+                        }
+                    }, 2000);
+
+                }
             }
         });
 
@@ -84,7 +108,7 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> implements
     @Override
     public <E extends Enum<E>> void onRetry(E w) {
 
-        Log.e("TAG", "onRetry: " );
+        Log.e("TAG", "onRetry: ");
 
     }
 
@@ -103,9 +127,9 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> implements
 
     }
 
-    private void showSpinner(){
+    private void showSpinner() {
 
-        BottomSheetFragment.newInstance(getSupportFragmentManager(),R.layout.item_layout);
+        BottomSheetFragment.newInstance(getSupportFragmentManager(), R.layout.item_layout);
 
     }
 }
